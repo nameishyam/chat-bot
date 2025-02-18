@@ -1,4 +1,3 @@
-````markdown
 # Chat Application
 
 ## Overview
@@ -44,7 +43,6 @@ This project is a **React-based chat application** that allows users to communic
    git clone https://github.com/yourusername/chat-application.git
    cd chat-application
    ```
-````
 
 2. **Install Dependencies**
 
