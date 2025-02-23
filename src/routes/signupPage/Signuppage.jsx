@@ -3,8 +3,12 @@ import "./Signuppage.css";
 
 const Signuppage = () => {
   return (
-    <div className="Signuppage">
-      <SignUp path="/sign-up" />
+    <div className="signUpPage">
+      <SignUp
+        path="/sign-up"
+        signInUrl="/sign-in"
+        forceRedirectUrl="/dashboard"
+      />
     </div>
   );
 };
