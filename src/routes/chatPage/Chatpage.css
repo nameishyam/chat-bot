@@ -7,10 +7,16 @@
 
   .wrapper {
     flex: 1;
-    overflow: scroll;
+    overflow: auto;
     width: 100%;
     display: flex;
     justify-content: center;
+
+    scrollbar-width: none; /* Firefox */
+
+    .wrapper::-webkit-scrollbar {
+      display: none; /* Chrome, Safari */
+    }
 
     .chat {
       width: 50%;
