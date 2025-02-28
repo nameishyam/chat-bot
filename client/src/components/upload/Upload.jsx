@@ -1,10 +1,10 @@
-import { IKContext, IKImage } from "imagekitio-react";
+import { IKContext, IKImage, IKUpload } from "imagekitio-react";
 
-const urlEndpoint = "<YOUR_IMAGEKIT_URL_ENDPOINT>";
-const publicKey = "<YOUR_IMAGEKIT_PUBLIC_KEY>";
+const urlEndpoint = import.meta.env.VITE_IMAGE_ENDPOINT;
+const publicKey = import.meta.env.VITE_IMAGE_PUBLIC_KEY;
 const authenticator = async () => {
   try {
-    const response = await fetch("http://localhost:3001/auth");
+    const response = await fetch("http://localhost:3000/api/upload");
 
     if (!response.ok) {
       const errorText = await response.text();
@@ -22,7 +22,37 @@ const authenticator = async () => {
 };
 
 const Upload = () => {
-  return <div>Upload</div>;
+  const onError = (err) => {
+    console.log("Error", err);
+  };
+
+  const onSuccess = (res) => {
+    console.log("Success", res);
+  };
+
+  const onUploadProgress = (progress) => {
+    console.log("Progress", progress);
+  };
+
+  const onUploadStart = (evt) => {
+    console.log("Start", evt);
+  };
+  return (
+    <IKContext
+      urlEndpoint={urlEndpoint}
+      publicKey={publicKey}
+      authenticator={authenticator}
+    >
+      <IKUpload
+        fileName="test-upload.png"
+        onError={onError}
+        onSuccess={onSuccess}
+        useUniqueFileName={true}
+        onUploadProgress={onUploadProgress}
+        onUploadStart={onUploadStart}
+      />
+    </IKContext>
+  );
 };
 
 export default Upload;
