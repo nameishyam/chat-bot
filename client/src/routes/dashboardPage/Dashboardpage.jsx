@@ -1,6 +1,23 @@
 import "./dashboardPage.css";
 
+const backendUrl = import.meta.env.VITE_BACKEND_URL;
+
 const DashboardPage = () => {
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const text = e.target.text.value;
+    if (!text) return;
+
+    await fetch(`${backendUrl}/api/chats`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ text }),
+    });
+  };
+
   return (
     <div className="dashboardPage">
       <div className="texts">
@@ -23,8 +40,8 @@ const DashboardPage = () => {
           </div>
         </div>
         <div className="formContainer">
-          <form>
-            <input type="text" placeholder="Ask me anything..." />
+          <form onSubmit={handleSubmit}>
+            <input type="text" name="text" placeholder="Ask me anything..." />
             <button>
               <img src="arrow.png" alt="arrow" />
             </button>
