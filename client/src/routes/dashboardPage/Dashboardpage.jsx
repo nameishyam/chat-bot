@@ -1,8 +1,11 @@
 import "./dashboardPage.css";
+import { useAuth } from "@clerk/clerk-react";
 
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
 const DashboardPage = () => {
+  const { userId } = useAuth();
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -11,10 +14,11 @@ const DashboardPage = () => {
 
     await fetch(`${backendUrl}/api/chats`, {
       method: "POST",
+      credentials: "include",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ text }),
+      body: JSON.stringify({ text, userId }),
     });
   };
 
