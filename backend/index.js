@@ -17,7 +17,14 @@ const __dirname = path.dirname(__filename);
 
 app.use(express.static(path.join(__dirname, "../client")));
 
-app.use(cors({ origin: "*" }));
+app.use(
+  cors({
+    origin: process.env.CLIENT_URL, // Or an array of allowed origins
+    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+    credentials: true,
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
 
 app.use(express.json());
 
