@@ -3,10 +3,13 @@ import ImageKit from "imagekit";
 import cors from "cors";
 import mongoose from "mongoose";
 import path from "path";
-import url, { fileURLToPath } from "url";
+import { fileURLToPath } from "url";
 import { requireAuth } from "@clerk/express";
 import Chat from "./models/chat.js";
 import UserChats from "./models/userChats.js";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 const port = process.env.PORT || 3000;
 
@@ -15,16 +18,31 @@ const app = express();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-app.use(express.static(path.join(__dirname, "../client")));
-
 app.use(
   cors({
-    origin: process.env.CLIENT_URL, // Or an array of allowed origins
+    origin: process.env.CLIENT_URL || "http://localhost:5173",
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
     credentials: true,
     allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
+
+app.use((request, response, next) => {
+  response.header(
+    "Access-Control-Allow-Origin",
+    process.env.CLIENT_URL || "http://localhost:5173"
+  );
+  response.header(
+    "Access-Control-Allow-Methods",
+    "GET,HEAD,PUT,PATCH,POST,DELETE"
+  );
+  response.header(
+    "Access-Control-Allow-Headers",
+    "Content-Type, Authorization"
+  );
+  response.header("Access-Control-Allow-Credentials", "true");
+  next();
+});
 
 app.use(express.json());
 
@@ -153,6 +171,8 @@ app.use((error, request, response, next) => {
   console.log(error.stack);
   response.status(401).send("Unauthenticated!");
 });
+
+app.use(express.static(path.join(__dirname, "../client")));
 
 app.get("*", (request, response) => {
   response.sendFile(path.join(__dirname, "../client", "index.html"));
