@@ -2,7 +2,7 @@ import express from "express";
 import ImageKit from "imagekit";
 import cors from "cors";
 import mongoose from "mongoose";
-import { ClerkExpressRequireAuth } from "@clerk/clerk-sdk-node";
+import { requireAuth } from "@clerk/express";
 import Chat from "./models/chat.js";
 import UserChats from "./models/userChats.js";
 
@@ -45,7 +45,7 @@ app.get(`/api/upload`, (request, response) => {
   response.send(result);
 });
 
-app.post(`/api/chats`, ClerkExpressRequireAuth(), async (request, response) => {
+app.post(`/api/chats`, requireAuth(), async (request, response) => {
   const userId = request.auth.userId;
   const { text } = request.body;
   try {
@@ -99,11 +99,22 @@ app.post(`/api/chats`, ClerkExpressRequireAuth(), async (request, response) => {
   }
 });
 
-app.get(`/api/userchats`, ClerkExpressRequireAuth(), (request, response) => {
+app.get(`/api/userchats`, requireAuth(), async (request, response) => {
   const userId = request.auth.userId;
   try {
-    const userChats = UserChats.find({ userId });
+    const userChats = await UserChats.find({ userId });
     response.status(200).send(userChats[0].chats);
+  } catch (error) {
+    console.log(error);
+    response.status(500).json({ error: error.message });
+  }
+});
+
+app.get(`/api/chats/:id`, requireAuth(), async (request, response) => {
+  const userId = request.auth.userId;
+  try {
+    const chat = await UserChats.find({ _id: request.params.id, userId });
+    response.status(200).send(chat);
   } catch (error) {
     console.log(error);
     response.status(500).json({ error: error.message });

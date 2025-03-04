@@ -1,4 +1,4 @@
-# Chat Application
+# Chat Application (sample readme only)
 
 ## Overview
 
