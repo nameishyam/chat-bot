@@ -2,6 +2,8 @@ import express from "express";
 import ImageKit from "imagekit";
 import cors from "cors";
 import mongoose from "mongoose";
+import path from "path";
+import url, { fileURLToPath } from "url";
 import { requireAuth } from "@clerk/express";
 import Chat from "./models/chat.js";
 import UserChats from "./models/userChats.js";
@@ -9,6 +11,11 @@ import UserChats from "./models/userChats.js";
 const port = process.env.PORT || 3000;
 
 const app = express();
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+app.use(express.static(path.join(__dirname, "../client")));
 
 app.use(
   cors({
@@ -143,6 +150,10 @@ app.put(`/api/chats/:id`, requireAuth(), async (request, response) => {
 app.use((error, request, response, next) => {
   console.log(error.stack);
   response.status(401).send("Unauthenticated!");
+});
+
+app.get("*", (request, response) => {
+  response.sendFile(path.join(__dirname, "../client", "index.html"));
 });
 
 app.listen(port, () => {
