@@ -49,8 +49,6 @@ app.post(`/api/chats`, requireAuth(), async (request, response) => {
   const userId = request.auth.userId;
   const { text } = request.body;
   try {
-    // CREATE NEW CHAT
-
     const newChat = new Chat({
       userId,
       history: [
@@ -61,11 +59,7 @@ app.post(`/api/chats`, requireAuth(), async (request, response) => {
       ],
     });
     const savedChat = await newChat.save();
-    // CHECK IF USERCHATS EXISTS
-
     const userChats = await UserChats.find({ userId });
-    // IF DOESNT EXISTST CREATE NEW ONE AND ADD TEH CHAT IN THE CHATS ARRAY
-
     if (!userChats.length) {
       const newUserChats = new UserChats({
         userId,
@@ -78,8 +72,6 @@ app.post(`/api/chats`, requireAuth(), async (request, response) => {
       });
       await newUserChats.save();
     } else {
-      // IF EXISTS, PUSH IT TO THE EXISTING ARRAY
-
       await UserChats.updateOne(
         { userId },
         {
@@ -113,8 +105,35 @@ app.get(`/api/userchats`, requireAuth(), async (request, response) => {
 app.get(`/api/chats/:id`, requireAuth(), async (request, response) => {
   const userId = request.auth.userId;
   try {
-    const chat = await UserChats.find({ _id: request.params.id, userId });
+    const chat = await Chat.findOne({ _id: request.params.id, userId });
     response.status(200).send(chat);
+  } catch (error) {
+    console.log(error);
+    response.status(500).json({ error: error.message });
+  }
+});
+
+app.put(`/api/chats/:id`, requireAuth(), async (request, response) => {
+  const userId = request.auth.userId;
+  const { question, answer, img } = request.body;
+  const newItems = [
+    ...(question
+      ? [{ role: "user", parts: [{ text: question }], ...(img && { img }) }]
+      : []),
+    { role: "model", parts: [{ text: answer }] },
+  ];
+  try {
+    const updatedChat = await Chat.updateOne(
+      { _id: request.params.id, userId },
+      {
+        $push: {
+          history: {
+            $each: newItems,
+          },
+        },
+      }
+    );
+    response.status(200).send(updatedChat);
   } catch (error) {
     console.log(error);
     response.status(500).json({ error: error.message });

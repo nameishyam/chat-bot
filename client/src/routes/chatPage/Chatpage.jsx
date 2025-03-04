@@ -3,20 +3,22 @@ import NewPrompt from "../../components/newPrompt/NewPrompt";
 import { useQuery } from "@tanstack/react-query";
 import { useLocation } from "react-router-dom";
 import Markdown from "react-markdown";
+import { IKImage } from "imagekitio-react";
 
-const Chatpage = () => {
+const ChatPage = () => {
   const path = useLocation().pathname;
-  const userId = path.split(`/`).pop();
+  const chatId = path.split("/").pop();
 
   const { isPending, error, data } = useQuery({
-    queryKey: ["chats", userId],
+    queryKey: ["chat", chatId],
     queryFn: () =>
-      fetch(`${import.meta.env.VITE_BACKEND_URL}/api/chats/${userId}`, {
+      fetch(`${import.meta.env.VITE_BACKEND_URL}/api/chats/${chatId}`, {
         credentials: "include",
       }).then((res) => res.json()),
   });
 
   console.log(data);
+
   return (
     <div className="chatPage">
       <div className="wrapper">
@@ -24,17 +26,36 @@ const Chatpage = () => {
           {isPending
             ? "Loading..."
             : error
-            ? "Something went worng!"
+            ? "Something went wrong!"
             : data?.history?.map((message, i) => (
-                <div className="message user" key={i}>
-                  <Markdown>{message.parts[0].text}</Markdown>
-                </div>
+                <>
+                  {message.img && (
+                    <IKImage
+                      urlEndpoint={import.meta.env.VITE_IMAGE_ENDPOINT}
+                      path={message.img}
+                      height="300"
+                      width="400"
+                      transformation={[{ height: 300, width: 400 }]}
+                      loading="lazy"
+                      lqip={{ active: true, quality: 20 }}
+                    />
+                  )}
+                  <div
+                    className={
+                      message.role === "user" ? "message user" : "message"
+                    }
+                    key={i}
+                  >
+                    <Markdown>{message.parts[0].text}</Markdown>
+                  </div>
+                </>
               ))}
-          <NewPrompt />
+
+          {data && <NewPrompt data={data} />}
         </div>
       </div>
     </div>
   );
 };
 
-export default Chatpage;
+export default ChatPage;
