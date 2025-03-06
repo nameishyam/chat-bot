@@ -12,6 +12,7 @@ dist
 .env
 dist-ssr
 *.local
+*.pem
 timestamps.txt
 
 # Editor directories and files
