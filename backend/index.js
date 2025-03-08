@@ -20,7 +20,7 @@ const __dirname = path.dirname(__filename);
 
 app.use(
   cors({
-    origin: process.env.CLIENT_URL || "http://localhost:5173",
+    origin: process.env.CLIENT_URL,
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
     credentials: true,
     allowedHeaders: ["Content-Type", "Authorization"],
@@ -28,10 +28,7 @@ app.use(
 );
 
 app.use((request, response, next) => {
-  response.header(
-    "Access-Control-Allow-Origin",
-    process.env.CLIENT_URL || "http://localhost:5173"
-  );
+  response.header("Access-Control-Allow-Origin", process.env.CLIENT_URL);
   response.header(
     "Access-Control-Allow-Methods",
     "GET,HEAD,PUT,PATCH,POST,DELETE"
@@ -60,12 +57,6 @@ const imagekit = new ImageKit({
   publicKey: process.env.IMAGE_PUBLIC_KEY,
   privateKey: process.env.IMAGE_PRIVATE_KEY,
 });
-
-// app.get(`/api/test`, ClerkExpressRequireAuth(), (request, response) => {
-//   const userId = request.auth.userId;
-//   console.log(userId);
-//   response.send("success");
-// });
 
 app.get(`/api/upload`, (request, response) => {
   const result = imagekit.getAuthenticationParameters();
