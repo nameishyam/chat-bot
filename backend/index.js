@@ -11,7 +11,7 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-const port = process.env.PORT || 3000;
+const port = process.env.PORT;
 
 const app = express();
 
@@ -169,7 +169,7 @@ app.get("*", (request, response) => {
   response.sendFile(path.join(__dirname, "../client", "index.html"));
 });
 
-app.listen(port, () => {
+app.listen(port, "0.0.0.0", () => {
   connect();
   console.log(`the server is running on port ${port}`);
 });
