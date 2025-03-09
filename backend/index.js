@@ -8,6 +8,7 @@ import { requireAuth } from "@clerk/express";
 import Chat from "./models/chat.js";
 import UserChats from "./models/userChats.js";
 import dotenv from "dotenv";
+import model from "./lib/gemini.js";
 
 dotenv.config();
 
@@ -58,6 +59,19 @@ const imagekit = new ImageKit({
   privateKey: process.env.IMAGE_PRIVATE_KEY,
 });
 
+const generateTitle = async (text) => {
+  try {
+    const prompt = `Imagine that you are a chatbot and user is asking you questions. each chat starts with a user message. and for each chat there will be a chat title. the chat title has to be decided by yourself only. all you need to do is to generate the appropriate title for the user message: "${text}". and remember that only to generate the title for the user message. you don't need to generate the response for the user message. just the title.`;
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    const title = response.text().trim();
+    return title || text.substring(0, 40);
+  } catch (error) {
+    console.log("Error generating title:", error);
+    return text.substring(0, 40);
+  }
+};
+
 app.get(`/api/upload`, (request, response) => {
   const result = imagekit.getAuthenticationParameters();
   response.send(result);
@@ -78,13 +92,16 @@ app.post(`/api/chats`, requireAuth(), async (request, response) => {
     });
     const savedChat = await newChat.save();
     const userChats = await UserChats.find({ userId });
+
+    const title = await generateTitle(text);
+
     if (!userChats.length) {
       const newUserChats = new UserChats({
         userId,
         chats: [
           {
             _id: savedChat._id,
-            title: text.substring(0, 40),
+            title,
           },
         ],
       });
@@ -96,7 +113,7 @@ app.post(`/api/chats`, requireAuth(), async (request, response) => {
           $push: {
             chats: {
               _id: savedChat._id,
-              title: text.substring(0, 40),
+              title,
             },
           },
         }
