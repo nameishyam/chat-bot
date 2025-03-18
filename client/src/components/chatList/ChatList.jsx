@@ -23,14 +23,14 @@ const ChatList = () => {
         {isPending
           ? "Loading..."
           : error
-          ? "Something went wrong!"
-          : Array.isArray(data)
-          ? data.map((chat) => (
-              <Link to={`/dashboard/chats/${chat._id}`} key={chat._id}>
-                {chat.title}
-              </Link>
-            ))
-          : ""}
+            ? "Something went wrong!"
+            : Array.isArray(data)
+              ? data.map((chat) => (
+                  <Link to={`/dashboard/chats/${chat._id}`} key={chat._id}>
+                    {chat.title}
+                  </Link>
+                ))
+              : ""}
       </div>
       <hr />
       <div className="upgrade">

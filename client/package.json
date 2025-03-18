@@ -20,6 +20,7 @@
     "prettier": "^3.5.3",
     "react": "19.0.0-rc-8b08e99e-20240713",
     "react-dom": "19.0.0-rc-8b08e99e-20240713",
+    "react-loading-icons": "^1.1.0",
     "react-markdown": "^10.0.0",
     "react-router-dom": "^7.1.5",
     "react-scrollbars-custom": "^4.1.1",
